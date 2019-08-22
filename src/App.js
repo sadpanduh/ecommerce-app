@@ -35,7 +35,6 @@ class App extends React.Component{
             }
           })
         });
-        
       }else{
         //if its null just set the current user to null, useful when you logout
         this.setState({currentUser: userAuth});
