@@ -6,7 +6,7 @@ import HomePage from './pages/homepage/homepage.component';
 import ShopPage from './pages/shop/shop.component';
 import Header from './components/header/header.component';
 import SignInAndSignUpPage from './pages/sign-in-and-sign-up/sign-in-and-sign-up.component';
-import {auth} from './firebase/firebase.utils';
+import {auth, createUserProfileDocument} from './firebase/firebase.utils';
 
 class App extends React.Component{
   constructor(){
@@ -22,9 +22,27 @@ class App extends React.Component{
 
   componentDidMount(){
     //this will listen for auth state changes
-    this.unsubscribeFromAuth = auth.onAuthStateChanged(user => {
-      this.setState({currentUser: user});
-    })
+    this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
+      //if the userAuth isnt null, set the userstate
+      if(userAuth){
+        const userRef = await createUserProfileDocument(userAuth);
+
+        userRef.onSnapshot(snapShot => {
+          this.setState({
+            currentUser: {
+              id: snapShot.id,
+              ...snapShot.data()
+            }
+          })
+        });
+        
+      }else{
+        //if its null just set the current user to null, useful when you logout
+        this.setState({currentUser: userAuth});
+      }
+
+
+    });
   }
 
   componentWillUnmount() {
