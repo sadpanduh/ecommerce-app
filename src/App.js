@@ -12,6 +12,7 @@ import Header from './components/header/header.component';
 import {auth, createUserProfileDocument} from './firebase/firebase.utils';
 import {setCurrentUser} from './redux/user/user.actions';
 import {selectCurrentUser} from './redux/user/user.selectors';
+
 class App extends React.Component{
   //property/function to handle auth
   unsubscribeFromAuth = null
@@ -26,19 +27,17 @@ class App extends React.Component{
         const userRef = await createUserProfileDocument(userAuth);
 
         userRef.onSnapshot(snapShot => {
-          setCurrentUser({
-            currentUser: {
-              id: snapShot.id,
-              ...snapShot.data()
-            }
-          })
+          const currentUser = {
+            id: snapShot.id,
+            ...snapShot.data()
+          };
+
+          setCurrentUser(currentUser);
         });
       }else{
         //if its null just set the current user to null, useful when you logout
         setCurrentUser(userAuth);
       }
-
-
     });
   }
 
