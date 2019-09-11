@@ -1,0 +1,22 @@
+.contact-page{
+    display: flex;
+    width: 400px;
+    height: 125px;
+    border: 4px solid black;
+    border-radius: 10px;
+    margin: auto; 
+    
+    &:hover{
+        background-color: aqua;
+    }
+
+    .social{
+        margin:auto;
+        width: 100%;
+        .linked-in{
+            width: 100%;
+        }
+    }
+    
+
+}
