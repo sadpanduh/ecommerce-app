@@ -41,6 +41,43 @@ export const createUserProfileDocument = async(userAuth, additionalData) => {
 
 firebase.initializeApp(config);
 
+//add a collection using existing data instead of adding in manually
+//this should only be called once in componentdidmount to add initially and then removed from componentdidmount
+export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => {
+    const collectionRef = firestore.collection(collectionKey);
+
+    //firestore can only make one set call at a time, you cant just set an array of documents
+    //since each each call is individual its best to batch the requests to make sure the code gets to the database correctly
+    const batch = firestore.batch();
+    objectsToAdd.forEach(obj => {
+        //get document at an empty string, tells firebase to get a new document ref and randomly generate an ID
+        const newDocref = collectionRef.doc();
+        batch.set(newDocref, obj);
+    });
+
+    //returns a promise, when succeeed it returns a void/null value
+    return await batch.commit();
+}
+
+//grabs the collection data and formats it to an object with data we want
+export const convertCollectionsSnapshotToMap = (collections) => {
+    const transformedCollection = collections.docs.map( doc => {
+        const {title, items} = doc.data();
+
+        return {
+            routeName: encodeURI(title.toLowerCase()),
+            id: doc.id,
+            title,
+            items
+        };
+    });
+
+    return transformedCollection.reduce((accumulator, collection) => {
+        accumulator[collection.title.toLowerCase()] = collection;
+        return accumulator;
+    },{});
+}
+
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
 
